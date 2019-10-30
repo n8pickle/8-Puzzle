@@ -45,4 +45,12 @@ public class Solver {
             StdOut.println("Unsolvable puzzle");
         }
     } // solve a slider puzzle (given below)
+
+    private class SearchNode() implements Comparable<T>{
+        Board b = intitial;
+        int numMoves = moves();
+        int priority;
+        SearchNode previous;
+
+    }
 }
