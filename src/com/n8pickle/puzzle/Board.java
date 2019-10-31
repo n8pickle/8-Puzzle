@@ -1,12 +1,11 @@
 package com.n8pickle.puzzle;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import edu.princeton.cs.algs4.Stack;
 
 public class Board {
     private int[][] blocks;
     private int N;
-    private final Board finished;
+    private Board finished;
 
     public Board(int[][] blocks)
     {
@@ -27,24 +26,66 @@ public class Board {
 
     public int hamming()                   // number of blocks out of place
     {
+        int outOfPlace = 0;
         for(int i = 0; i < N; i++) {
-            
+            for(int j = 0; j < N; i++) {
+                if(blocks[i][j] != finished.blocks[i][j])
+                    outOfPlace += 1;
+            }
         }
+        return outOfPlace;
     }
 
     public int manhattan()                 // sum of Manhattan distances between blocks and goal
     {
+        int distanceAway;
+        int column;
+        int row;
+        int result = 0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                column = blocks[i][j] % 3;
+                row = (blocks[i][j] -1) % 3;
+                result += Math.abs((i - row)) +  Math.abs((j - column));
+                // % 3 gets column
+                //num - 1 / 3 gets row
+                }
+            }
+            return result;
+        }
 
-    }
 
     public boolean isGoal()                // is this board the goal board?
     {
+        finished = new Board(createSolution());
         return this.equals(finished);
     }
 
     public boolean isSolvable()            // is this board solvable?
     {
-
+        int outOfPlace;
+        int inversions = 0;
+        int emptySpaceRow = 0;
+        int[] numbers = new int[blocks.length];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                numbers[j + (i*N)] = blocks[i][j];
+            }
+        }
+        for(int k = 0; k < numbers.length - 1; k++) {
+            if(numbers[k] - 1 != k) {
+                outOfPlace = numbers[k];
+                for (int l = k + 1; l < numbers.length - 1; l++) {
+                    if (numbers[l] < outOfPlace && numbers[l] != 0)
+                        inversions++;
+                    else if (numbers[l] == 0)
+                        emptySpaceRow = l/N;
+                }
+            }
+        }
+        if (N % 2 == 1 && inversions % 2 == 0 || N % 2 == 0 && (emptySpaceRow + inversions) % 2 != 0)
+            return true;
+        return false;
     }
 
     public boolean equals(Object y)        // does this board equal y?
@@ -54,7 +95,9 @@ public class Board {
 
     public Iterable<Board> neighbors()     // all neighboring boards
     {
-        return new MyIterator<E>();
+        Stack s = new Stack();
+        ...
+        return s;
     }
 
     public String toString()               // string representation of this board (in the output format specified below)
@@ -79,33 +122,10 @@ public class Board {
         int[][] solution = new int[N][N];
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                solution[j][i] = i+j+1;
+                solution[i][j] = i+j+1;
             }
         }
         return solution;
-    }
-
-    private class MyIterator<E> implements Iterator<E>
-    {
-        RandomizedQueue.Node curr = head;
-
-        public E Remove()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return curr.getNext() != tail;
-        }
-
-        @Override
-        public E next() {
-            if(!hasNext())
-                throw new NoSuchElementException();
-            curr = curr.getNext();
-            return (E) curr.getE();
-        }
     }
 
 }
